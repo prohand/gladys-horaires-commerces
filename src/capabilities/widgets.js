@@ -2,7 +2,8 @@
 // Dashboard widgets (Gladys 5.1+).
 //
 //   - `store_hours`: which stores are open, until when — or one store in
-//     detail, with today's hours.
+//     detail, with today's hours and, with the `days` setting, those of the
+//     next days (at most 6: the status list holds 10 rows).
 //
 // The content is declarative (the core renders it, no HTML): see the
 // "Dashboard widgets" section of the SDK README for the vocabulary and the
@@ -21,10 +22,45 @@ import {
   describeToday,
   describeWhen,
 } from '../shops/stores.js';
+import { formatRanges } from '../shops/hours.js';
 
 export const WIDGET_KEYS = { STORE_HOURS: 'store_hours' };
 
 const clip = (text, length) => (text.length > length ? `${text.slice(0, length - 1)}…` : text);
+
+/** The next days a store in detail may show: the rest of the week. */
+export const MAX_NEXT_DAYS = 6;
+
+/** The `days` setting, whatever its type: an integer within 0..MAX_NEXT_DAYS. */
+function nextDaysSetting(value) {
+  const days = Math.trunc(Number(value));
+  return Number.isFinite(days) ? Math.min(Math.max(days, 0), MAX_NEXT_DAYS) : 0;
+}
+
+/** "Tomorrow", "Sunday 8", "Wednesday 11 · holiday", in a language. */
+function dayLabel(day, language) {
+  // The weekday from Intl, the day number added here: the order Intl picks
+  // for both together changes with the ICU version of the runtime.
+  const weekday = new Intl.DateTimeFormat(language, { weekday: 'long', timeZone: 'UTC' }).format(
+    day.date,
+  );
+  const number = day.date.getUTCDate();
+  let label =
+    day.dayOffset === 1
+      ? pick(language, { en: 'Tomorrow', fr: 'Demain', de: 'Morgen', es: 'Mañana' })
+      : pick(language, {
+          en: `${weekday} ${number}`,
+          fr: `${weekday} ${number}`,
+          de: `${weekday}, ${number}.`,
+          es: `${weekday} ${number}`,
+        });
+  label = label.charAt(0).toUpperCase() + label.slice(1);
+  if (day.holiday) {
+    const holiday = pick(language, { en: 'holiday', fr: 'férié', de: 'Feiertag', es: 'festivo' });
+    label = `${label} · ${holiday}`;
+  }
+  return clip(label, 40);
+}
 
 /** "Open · closes at 20:00", short enough for a status row (40). */
 function statusLine(status, language) {
@@ -71,8 +107,11 @@ function buildStoresOverview(watcher, language) {
   };
 }
 
-/** One store in detail: a countdown tile and its state, next change, today's hours. */
-function buildStoreDetail(watcher, store, language) {
+/**
+ * One store in detail: a countdown tile and its state, next change, today's
+ * hours and those of the `days` next days.
+ */
+function buildStoreDetail(watcher, store, language, days) {
   const status = watcher.status(store);
   if (!status) {
     return {
@@ -122,6 +161,17 @@ function buildStoreDetail(watcher, store, language) {
     icon: 'calendar',
     color: WIDGET_COLORS.NEUTRAL,
   });
+  for (const day of watcher.upcoming(store, days)) {
+    items.push({
+      label: dayLabel(day, language),
+      value:
+        day.ranges.length > 0
+          ? clip(formatRanges(day.ranges), 40)
+          : { en: 'Closed', fr: 'Fermé', de: 'Geschlossen', es: 'Cerrado' },
+      icon: 'calendar',
+      color: day.ranges.length > 0 ? WIDGET_COLORS.NEUTRAL : WIDGET_COLORS.WARNING,
+    });
+  }
   const place = describePlace(store.place, language);
   if (place) {
     items.push({
@@ -160,7 +210,7 @@ export function buildStoreWidget({ watcher, settings = {}, language = 'en' }) {
   }
   const store = settings?.store ? watcher.find(settings.store) : null;
   return store
-    ? buildStoreDetail(watcher, store, language)
+    ? buildStoreDetail(watcher, store, language, nextDaysSetting(settings.days))
     : buildStoresOverview(watcher, language);
 }
 

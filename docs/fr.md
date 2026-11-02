@@ -151,7 +151,9 @@ Gladys.
 
 - **Horaires des commerces** : tous les commerces d'un coup d'œil (ouvert ou fermé,
   jusqu'à quand), ou — avec le réglage _Commerce_ — un commerce en détail, avec un
-  compte à rebours et les horaires du jour.
+  compte à rebours et les horaires du jour. Le réglage _Jours suivants affichés_
+  (0 à 6) ajoute à ce détail les horaires des jours suivants, jours fériés signalés :
+  6 montre toute la semaine.
 
 ## Dépannage
 

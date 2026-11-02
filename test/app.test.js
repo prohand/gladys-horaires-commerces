@@ -312,6 +312,45 @@ test('the store widget: every store at a glance, one in detail', async () => {
   assert.equal(one.data.content.components[1].value, 60);
 });
 
+test('the store widget: the hours of the next days, holidays marked', async () => {
+  const { gladys } = await setup();
+  const store = storeIds(gladys, 'leclerc').device;
+  const rows = async (days, language = 'fr') => {
+    const ack = await gladys.fake.widgetGet('store_hours', { settings: { store, days }, language });
+    assert.deepEqual(validateWidgetContent(ack.data.content), [], `${days} ${language}`);
+    return ack.data.content.components.find((c) => c.type === 'status').items;
+  };
+  // No setting (the widgets made before it): today only, as before.
+  assert.equal((await rows(undefined)).length, 3);
+  assert.equal((await rows(0)).length, 3);
+  // Friday 30 October: Saturday, then All Saints' Day (a Sunday, PH off).
+  const week = await rows(6);
+  assert.equal(week.length, 9);
+  assert.deepEqual(
+    week.slice(3).map((item) => [item.label, item.value.fr ?? item.value, item.color]),
+    [
+      ['Demain', '08:30-20:00', 'neutral'],
+      ['Dimanche 1 · férié', 'Fermé', 'warning'],
+      ['Lundi 2', '08:30-20:00', 'neutral'],
+      ['Mardi 3', '08:30-20:00', 'neutral'],
+      ['Mercredi 4', '08:30-20:00', 'neutral'],
+      ['Jeudi 5', '08:30-20:00', 'neutral'],
+    ],
+  );
+  assert.equal((await rows(6, 'en'))[4].label, 'Sunday 1 · holiday');
+  // Out of range or typed as text: kept within 0..6.
+  assert.equal((await rows('2')).length, 5);
+  assert.equal((await rows(99)).length, 9);
+  assert.equal((await rows(-1)).length, 3);
+  assert.equal((await rows('x')).length, 3);
+  for (const language of ['en', 'fr', 'de', 'es']) {
+    await rows(6, language);
+  }
+  // Every store at a glance: one row per store, the setting does not apply.
+  const all = await gladys.fake.widgetGet('store_hours', { settings: { days: 6 }, language: 'fr' });
+  assert.equal(all.data.content.components[0].items.length, 2);
+});
+
 test('the widget stays valid with no store and unreadable hours', async () => {
   const empty = await setup({ config: {} });
   const ack = await empty.gladys.fake.widgetGet('store_hours', { settings: {} });

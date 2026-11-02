@@ -7,6 +7,7 @@ import {
   OpeningHoursError,
   parseOpeningHours,
   storeStatus,
+  upcomingDays,
 } from '../src/shops/hours.js';
 
 const PARIS = 'Europe/Paris';
@@ -87,6 +88,36 @@ test('closed on Sunday and on a public holiday: the next opening skips both', ()
   const armistice = storeStatus(schedule, at('2026-11-11T10:00:00Z'), PARIS);
   assert.equal(armistice.open, false);
   assert.deepEqual(armistice.today, []);
+});
+
+test('the next days: their date, their hours, the public holidays', () => {
+  const schedule = parseOpeningHours('Mo-Sa 08:30-20:00; PH off');
+  // Friday 2026-10-30 at 23:30 in Paris (22:30 UTC): the next day is Saturday
+  // on the French clock, whatever the UTC date.
+  const days = upcomingDays(schedule, at('2026-10-30T22:30:00Z'), PARIS, 3);
+  assert.deepEqual(
+    days.map((day) => [
+      day.dayOffset,
+      day.date.toISOString().slice(0, 10),
+      day.holiday,
+      formatRanges(day.ranges),
+    ]),
+    [
+      [1, '2026-10-31', false, '08:30-20:00'],
+      [2, '2026-11-01', true, ''],
+      [3, '2026-11-02', false, '08:30-20:00'],
+    ],
+  );
+  // A holiday the hours do not mention keeps the hours of its weekday.
+  const plain = upcomingDays(
+    parseOpeningHours('Mo-Su 09:00-12:00'),
+    at('2026-10-31T10:00:00Z'),
+    PARIS,
+    1,
+  );
+  assert.equal(plain[0].holiday, true);
+  assert.equal(formatRanges(plain[0].ranges), '09:00-12:00');
+  assert.deepEqual(upcomingDays(schedule, at('2026-10-31T10:00:00Z'), PARIS, 0), []);
 });
 
 test('a lunch break is a closing, ranges across midnight merge', () => {

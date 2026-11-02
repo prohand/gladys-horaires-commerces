@@ -22,7 +22,7 @@ import { TIME_ZONE } from '../config.js';
 import { FEATURES, OSM_PREFIX, PARAMS, storeIds } from '../devices/index.js';
 import { localize, pick } from '../i18n.js';
 import { autoSearch } from './finder.js';
-import { formatRanges, parseOpeningHours, storeStatus } from './hours.js';
+import { formatRanges, parseOpeningHours, storeStatus, upcomingDays } from './hours.js';
 
 const logger = createLogger({ name: 'stores' });
 
@@ -250,6 +250,13 @@ export class StoreWatcher {
   /** A store's status now, `null` while its hours cannot be read. */
   status(store) {
     return store?.schedule ? storeStatus(store.schedule, this.now(), TIME_ZONE) : null;
+  }
+
+  /** The hours of a store's next `count` days, `[]` while its hours cannot be read. */
+  upcoming(store, count) {
+    return store?.schedule && count > 0
+      ? upcomingDays(store.schedule, this.now(), TIME_ZONE, count)
+      : [];
   }
 
   /** Publish the features of every store and fire the due triggers. */

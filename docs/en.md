@@ -139,7 +139,9 @@ found before stay, and the lookup tries again within the hour.
 ## Dashboard
 
 - **Shop hours**: every shop at a glance (open or closed, until when), or — with the
-  setting _Shop_ — one shop in detail, with a countdown and today's hours.
+  setting _Shop_ — one shop in detail, with a countdown and today's hours. The
+  setting _Next days shown_ (0 to 6) adds the hours of the following days to that
+  detail, public holidays marked: 6 shows the whole week.
 
 ## Troubleshooting
 

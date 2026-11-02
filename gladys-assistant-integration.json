@@ -568,6 +568,20 @@
             "es": "Comercio (vacío: todos)"
           },
           "required": false
+        },
+        {
+          "key": "days",
+          "type": "number",
+          "label": {
+            "en": "Next days shown (one shop: 0 to 6)",
+            "fr": "Jours suivants affichés (un commerce : 0 à 6)",
+            "de": "Angezeigte Folgetage (ein Geschäft: 0 bis 6)",
+            "es": "Días siguientes mostrados (un comercio: 0 a 6)"
+          },
+          "required": false,
+          "default": 0,
+          "min": 0,
+          "max": 6
         }
       ]
     }
