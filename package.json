@@ -1,6 +1,6 @@
 {
   "name": "gladys-horaires-commerces",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "private": true,
   "description": "Gladys Assistant external integration: the opening hours of your shops, typed or found on OpenStreetMap.",
   "type": "module",
