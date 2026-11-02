@@ -10,6 +10,12 @@ the version's GitHub Release.
 
 ## [Unreleased]
 
+### Added
+
+- Shop hours widget: new setting "Next days shown" (0 to 6). A shop in detail also
+  shows the hours of the following days, public holidays marked; 6 shows the whole
+  week.
+
 ## [1.0.1] - 2026-10-30
 
 ### Added

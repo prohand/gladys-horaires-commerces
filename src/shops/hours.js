@@ -176,14 +176,33 @@ export function localTime(date, timeZone) {
   };
 }
 
-/** The ranges of the day `offset` days after a local date. */
-function rangesOf(schedule, { year, month, day }, offset) {
+/**
+ * The day `offset` days after a local date: its date (midnight UTC, to be
+ * formatted on the UTC clock), whether it is a public holiday, its ranges.
+ */
+function dayOf(schedule, { year, month, day }, offset) {
   const date = new Date(Date.UTC(year, month - 1, day + offset));
-  const iso = date.toISOString().slice(0, 10);
-  if (schedule.holidays && frenchHolidays(date.getUTCFullYear()).has(iso)) {
-    return schedule.holidays;
-  }
-  return schedule.week[(date.getUTCDay() + 6) % 7];
+  const holiday = frenchHolidays(date.getUTCFullYear()).has(date.toISOString().slice(0, 10));
+  const ranges =
+    holiday && schedule.holidays ? schedule.holidays : schedule.week[(date.getUTCDay() + 6) % 7];
+  return { date, holiday, ranges };
+}
+
+/** The ranges of the day `offset` days after a local date. */
+function rangesOf(schedule, local, offset) {
+  return dayOf(schedule, local, offset).ranges;
+}
+
+/**
+ * The hours of the `count` days after today, on the local clock.
+ * @returns {Array<{ dayOffset: number, date: Date, holiday: boolean, ranges: Array<[number, number]> }>}
+ */
+export function upcomingDays(schedule, now, timeZone, count) {
+  const local = localTime(now, timeZone);
+  return Array.from({ length: count }, (_, index) => ({
+    dayOffset: index + 1,
+    ...dayOf(schedule, local, index + 1),
+  }));
 }
 
 function formatClock(minutes) {

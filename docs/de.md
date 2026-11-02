@@ -154,7 +154,8 @@ Gladys.
 
 - **Öffnungszeiten**: alle Geschäfte auf einen Blick (geöffnet oder geschlossen, bis
   wann), oder — mit der Einstellung _Geschäft_ — ein Geschäft im Detail, mit
-  Countdown und den heutigen Zeiten.
+  Countdown und den heutigen Zeiten. Die Einstellung _Angezeigte Folgetage_ (0 bis 6) ergänzt diese Ansicht um die Zeiten der folgenden Tage, Feiertage markiert: 6
+  zeigt die ganze Woche.
 
 ## Fehlerbehebung
 

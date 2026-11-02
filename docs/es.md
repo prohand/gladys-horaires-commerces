@@ -147,7 +147,9 @@ Gladys.
 
 - **Horario de comercios**: todos los comercios de un vistazo (abierto o cerrado,
   hasta cuándo), o — con el ajuste _Comercio_ — un comercio en detalle, con una cuenta
-  atrás y el horario de hoy.
+  atrás y el horario de hoy. El ajuste _Días siguientes mostrados_ (0 a 6) añade el
+  horario de los días siguientes, con los festivos señalados: 6 muestra toda la
+  semana.
 
 ## Solución de problemas
 
