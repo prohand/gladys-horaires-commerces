@@ -10,6 +10,10 @@ the version's GitHub Release.
 
 ## [Unreleased]
 
+## [1.0.3] - 2026-11-16
+
+- Maintenance release, no functional change.
+
 ## [1.0.2] - 2026-11-02
 
 ### Added
@@ -46,6 +50,7 @@ the version's GitHub Release.
   multi-arch image build, Release and GitHub releases workflows, Dependabot.
 - `SECURITY.md` and `CLAUDE.md`.
 
-[Unreleased]: https://github.com/prohand/gladys-horaires-commerces/compare/v1.0.2...HEAD
+[Unreleased]: https://github.com/prohand/gladys-horaires-commerces/compare/v1.0.3...HEAD
+[1.0.3]: https://github.com/prohand/gladys-horaires-commerces/compare/v1.0.2...v1.0.3
 [1.0.2]: https://github.com/prohand/gladys-horaires-commerces/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/prohand/gladys-horaires-commerces/releases/tag/v1.0.1
